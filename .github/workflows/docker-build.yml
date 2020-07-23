@@ -1,0 +1,18 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Dockerfile
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }}| docker login https://docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+        #export gendtag=$(git rev-parse --short HEAD)_$(date "+%m%d-%H-%M-%S")
+        docker build -t docker.pkg.github.com/koumaza/docker-android_archlinux/android_archlinux:latest .
+        docker push     docker.pkg.github.com/koumaza/docker-android_archlinux/android_archlinux:latest
