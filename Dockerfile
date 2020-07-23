@@ -11,6 +11,6 @@ RUN useradd ww -md /ww \
 &&  echo 'ww ALL=NOPASSWD:ALL'>>/etc/sudoers \
 # Pacman
 && pacman -Syyuu --needed --noconfirm base base-devel go git ed \
-&& su ww -c 'cd ~/ && git clone --depth=1 --single-branch https://aur.archlinux.org/yay-git.git yay-git/ && cd yay-git/ && yes|makepkg -si' && cd \
+&& su ww -c "cd ~/ && git clone --depth=1 --single-branch https://aur.archlinux.org/yay-git.git yay-git/ && cd yay-git/ && yes|makepkg -si" && cd \
 # Yay
-&& su ww -c 'cd ~/ && yay -Syy --needed --noconfirm $(echo ${pacman_packages}|tr ' ' ' ') && yes|yay -Scccc' && cd
+&& su ww -c "cd ~/ && yay -Syy --needed --noconfirm $(echo ${pacman_packages}|tr ' ' ' ') && yes|yay -Scccc" && cd
