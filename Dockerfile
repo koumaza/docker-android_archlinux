@@ -10,7 +10,7 @@ ENV pacman_packages='acl adobe-source-code-pro-fonts adwaita-icon-theme alsa-lib
 RUN useradd ww -md /ww \
 &&  echo 'ALL=NOPASSWD:ALL' >/dev/null \
 # Pacman
-&& pacman -Syyuu --needed --noconfirm base base-devel go \
+&& pacman -Syyuu --needed --noconfirm base base-devel go git ed \
 && su ww -c 'git clone --depth=1 --single-branch https://aur.archlinux.org/yay-git.git yay-git/ && cd yay-git/ && yes|makepkg -si' \
 # Yay
 && su ww -c 'yay -Syy --needed --noconfirm $(echo ${pacman_packages}|tr ' ' ' ') && yes|yay -Scccc'
