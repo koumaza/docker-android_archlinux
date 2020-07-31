@@ -7,12 +7,14 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Build Dockerfile
+      env:
+        DOCKER_NAME: android_archlinux
       run: |
-        echo ${{ secrets.GITHUB_TOKEN }}| docker login https://docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-        #export gendtag=$(git rev-parse --short HEAD)_$(date "+%m%d-%H-%M-%S")
-        docker build -t docker.pkg.github.com/koumaza/docker-android_archlinux/android_archlinux:latest .
-        docker push     docker.pkg.github.com/koumaza/docker-android_archlinux/android_archlinux:latest
+        export GITHUB_DOCKER_REPO=$(printf $GITHUB_REPOSITORY|sed -e 's/^.*\///')
+        echo ${DOCKER_PASSWORD:-${{ secrets.GITHUB_TOKEN }}} | docker login https://${DOCKER_PROVIDER:-docker.pkg.github.com} -u ${DOCKER_USERNAME:-${{ github.actor }}} --password-stdin
+        docker build -t ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_REPO:-${GITHUB_DOCKER_REPO}}/${DOCKER_NAME}:${DOCKER_TAG:-latest} ${DOCKERFILE_PATH:-.}
+        docker push     ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_REPO:-${GITHUB_DOCKER_REPO}}/${DOCKER_NAME}:${DOCKER_TAG:-latest}
