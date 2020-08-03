@@ -20,7 +20,11 @@ jobs:
         echo ${DOCKER_PASSWORD:-${{ secrets.GITHUB_TOKEN }}} | docker login https://${DOCKER_PROVIDER:-docker.pkg.github.com} -u ${DOCKER_USERNAME:-${{ github.actor }}} --password-stdin
         docker build -t ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_REPO:-${GITHUB_DOCKER_REPO}}/${DOCKER_NAME}:${DOCKER_TAG:-latest} ${DOCKERFILE_PATH:-.}
         echo ${DOCKER_PASSWORD:-${{ secrets.GITHUB_TOKEN }}} | docker login https://${DOCKER_PROVIDER:-docker.pkg.github.com} -u ${DOCKER_USERNAME:-${{ github.actor }}} --password-stdin
-        docker push     ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_REPO:-${GITHUB_DOCKER_REPO}}/${DOCKER_NAME}:${DOCKER_TAG:-latest}
+        if [ $DOCKER_HUB = 1 ]; then
+          docker push   ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_NAME}:${DOCKER_TAG:-latest}
+        else
+          docker push   ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_REPO:-${GITHUB_DOCKER_REPO}}/${DOCKER_NAME}:${DOCKER_TAG:-latest}
+        fi
   "Push_Docker-Hub":
     runs-on: ubuntu-20.04
     steps:
@@ -31,9 +35,14 @@ jobs:
         DOCKER_REPO: android_archlinux
         DOCKER_PROVIDER: registry.hub.docker.com
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        DOCKER_HUB: 1
       run: |
         export GITHUB_DOCKER_REPO=$(printf $GITHUB_REPOSITORY|sed -e 's/^.*\///')
         echo ${DOCKER_PASSWORD:-${{ secrets.GITHUB_TOKEN }}} | docker login https://${DOCKER_PROVIDER:-docker.pkg.github.com} -u ${DOCKER_USERNAME:-${{ github.actor }}} --password-stdin
         docker build -t ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_REPO:-${GITHUB_DOCKER_REPO}}/${DOCKER_NAME}:${DOCKER_TAG:-latest} ${DOCKERFILE_PATH:-.}
         echo ${DOCKER_PASSWORD:-${{ secrets.GITHUB_TOKEN }}} | docker login https://${DOCKER_PROVIDER:-docker.pkg.github.com} -u ${DOCKER_USERNAME:-${{ github.actor }}} --password-stdin
-        docker push     ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_REPO:-${GITHUB_DOCKER_REPO}}/${DOCKER_NAME}:${DOCKER_TAG:-latest}
+        if [ $DOCKER_HUB = 1 ]; then
+          docker push   ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_NAME}:${DOCKER_TAG:-latest}
+        else
+          docker push   ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_REPO:-${GITHUB_DOCKER_REPO}}/${DOCKER_NAME}:${DOCKER_TAG:-latest}
+        fi
