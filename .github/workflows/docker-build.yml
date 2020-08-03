@@ -12,9 +12,19 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
-    - name: Build Dockerfile
+    - name: Push to GitHub Actions
       env:
         DOCKER_NAME: android_archlinux
+      run: |
+        export GITHUB_DOCKER_REPO=$(printf $GITHUB_REPOSITORY|sed -e 's/^.*\///')
+        echo ${DOCKER_PASSWORD:-${{ secrets.GITHUB_TOKEN }}} | docker login https://${DOCKER_PROVIDER:-docker.pkg.github.com} -u ${DOCKER_USERNAME:-${{ github.actor }}} --password-stdin
+        docker build -t ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_REPO:-${GITHUB_DOCKER_REPO}}/${DOCKER_NAME}:${DOCKER_TAG:-latest} ${DOCKERFILE_PATH:-.}
+        docker push     ${DOCKER_PROVIDER:-docker.pkg.github.com}/${DOCKER_USERNAME:-${{ github.actor }}}/${DOCKER_REPO:-${GITHUB_DOCKER_REPO}}/${DOCKER_NAME}:${DOCKER_TAG:-latest}
+    - name: Push to Docker Hub
+      env:
+        DOCKER_NAME: android_archlinux
+        DOCKER_PROVIDER: hub.docker.com
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         export GITHUB_DOCKER_REPO=$(printf $GITHUB_REPOSITORY|sed -e 's/^.*\///')
         echo ${DOCKER_PASSWORD:-${{ secrets.GITHUB_TOKEN }}} | docker login https://${DOCKER_PROVIDER:-docker.pkg.github.com} -u ${DOCKER_USERNAME:-${{ github.actor }}} --password-stdin
